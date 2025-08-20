@@ -12,13 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from "react";
-import {render} from "react-dom";
-import App from "./App";
+import i18n from "i18next";
+import {initReactI18next} from "react-i18next";
+import LanguageDetector from "i18next-browser-languagedetector";
+import Backend from "i18next-http-backend";
 
-const root = document.createElement("div");
+i18n
+  .use(Backend)
+  .use(LanguageDetector)
+  .use(initReactI18next)
+  .init({
+    // delete to auto detact browser language after complete i18n
+    lng: "en",
+    fallbackLng: "en",
+    debug: process.env.NODE_ENV === "development",
+    interpolation: {
+      escapeValue: false,
+    },
+    backend: {
+      loadPath: "/locales/{{lng}}/translation.json",
+    },
+    react: {
+      useSuspense: false,
+    },
+  });
 
-root.id = "root";
-document.body.appendChild(root);
-
-render(<App />, document.getElementById("root"));
+export default i18n;

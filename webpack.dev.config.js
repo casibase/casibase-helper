@@ -16,6 +16,7 @@ const webpack = require('webpack')
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { spawn } = require('child_process')
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const defaultInclude = path.resolve(__dirname, 'src')
 
@@ -52,6 +53,12 @@ module.exports = {
     new HtmlWebpackPlugin({ title: 'Casibase Helper' }),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('development')
+    }),
+    // copy i18n language file
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: 'src/locales', to: 'locales' }
+      ]
     })
   ],
   devtool: 'cheap-source-map',
