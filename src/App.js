@@ -13,12 +13,32 @@
 // limitations under the License.
 
 import React from "react";
-import {render} from "react-dom";
-import App from "./App";
+import {ConfigProvider, Layout} from "antd";
+import {BrowserRouter as Router} from "react-router-dom";
+import "./i18n";
+import "./assets/App.css";
+import Sidebar from "./components/Sidebar";
+import Titlebar from "./components/Titlebar";
 
-const root = document.createElement("div");
+const {Content, Sider} = Layout;
 
-root.id = "root";
-document.body.appendChild(root);
+function App() {
+  return (
+    <ConfigProvider theme={"default"}>
+      <Router>
+        <Layout>
+          <Titlebar />
+          <Layout>
+            <Sider collapsible>
+              <Sidebar />
+            </Sider>
+            <Content>
+            </Content>
+          </Layout>
+        </Layout>
+      </Router>
+    </ConfigProvider>
+  );
+}
 
-render(<App />, document.getElementById("root"));
+export default App;
