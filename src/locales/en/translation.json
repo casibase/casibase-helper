@@ -3,5 +3,13 @@
     "Home":"Home",
     "Logs":"Logs",
     "Config":"Config"
+  },
+  "version": {
+    "casibaseVersion":"Casibase Version",
+    "currentVersion":"Current Version",
+    "latestVersion":"Latest Version",
+    "notDownloaded":"Not downloaded",
+    "update":"Update",
+    "download":"Download"
   }
 }
