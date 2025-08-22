@@ -12,17 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from "react";
+import React, {useState} from "react";
 import {ConfigProvider, Layout} from "antd";
-import {BrowserRouter as Router} from "react-router-dom";
+import {Route, BrowserRouter as Router, Switch} from "react-router-dom";
 import "./i18n";
 import "./assets/App.css";
 import Sidebar from "./components/Sidebar";
 import Titlebar from "./components/Titlebar";
+import HomePage from "./components/HomePage";
 
 const {Content, Sider} = Layout;
 
 function App() {
+  const [isUpdating, setIsUpdating] = useState(false);
+
   return (
     <ConfigProvider theme={"default"}>
       <Router>
@@ -33,6 +36,14 @@ function App() {
               <Sidebar />
             </Sider>
             <Content>
+              <Switch>
+                <Route exact path="/">
+                  <HomePage
+                    setIsUpdating={setIsUpdating}
+                    isUpdating={isUpdating}
+                  />
+                </Route>
+              </Switch>
             </Content>
           </Layout>
         </Layout>

@@ -16,6 +16,7 @@
 const { app, BrowserWindow, ipcMain } = require("electron")
 const path = require("path")
 const url = require("url")
+const {registerHandlers} = require("./src/IpcRegister")
 
 let mainWindow
 
@@ -65,6 +66,8 @@ function createWindow() {
   }
 
   mainWindow.loadURL(indexPath)
+
+  registerHandlers(mainWindow)
 
   mainWindow.once("ready-to-show", () => {
     mainWindow.show()
