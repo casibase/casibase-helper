@@ -15,6 +15,7 @@
 import React, {useEffect, useState} from "react";
 import {Button, Card, Space, Spin, Tag, Typography} from "antd";
 import {Progress} from "antd";
+import PropTypes from "prop-types";
 import {useTranslation} from "react-i18next";
 const {ipcRenderer} = window.require("electron");
 import {getLatestVersion, getLocalVersion, update} from "../backends/version";
