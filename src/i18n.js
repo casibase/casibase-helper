@@ -16,6 +16,8 @@ import i18n from "i18next";
 import {initReactI18next} from "react-i18next";
 import LanguageDetector from "i18next-browser-languagedetector";
 import Backend from "i18next-http-backend";
+const path = require("path");
+const isDev = process.env.NODE_ENV === "development";
 
 i18n
   .use(Backend)
@@ -30,7 +32,9 @@ i18n
       escapeValue: false,
     },
     backend: {
-      loadPath: "/locales/{{lng}}/translation.json",
+      loadPath: isDev
+        ? "/locales/{{lng}}/translation.json"
+        : path.join(process.resourcesPath, "locales/{{lng}}/translation.json"),
     },
     react: {
       useSuspense: false,

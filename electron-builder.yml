@@ -1,0 +1,49 @@
+appId: org.casibase.helper
+productName: CasibaseHelper
+copyright: Copyright © 2025
+
+directories:
+  output: release
+  buildResources: build
+
+files:
+  - "dist/**"
+  - "main.js"
+  - "src/IpcRegister.js"
+  - "src/locales/**"
+
+extraResources:
+  - from: "src/locales/"
+    to: "locales"
+    filter:
+      - "**/*"
+
+asar: true
+
+win:
+  icon: build/icon.ico
+  target:
+    - nsis
+  artifactName: "${productName}-Setup-${version}.exe"
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  perMachine: false
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+
+mac:
+  icon: build/icon.icns
+  target:
+    - dmg
+  category: public.app-category.utilities
+
+linux:
+  icon: build/icon.png
+  target:
+    - AppImage
+  maintainer: "Casibase Team"
+  category: Utility
+
+publish: null
