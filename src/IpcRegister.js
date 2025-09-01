@@ -16,12 +16,18 @@ const fetch = require("node-fetch");
 const fs = require("fs-extra");
 const unzipper = require("unzipper");
 const {ipcMain} = require("electron");
+const {HttpsProxyAgent} = require("https-proxy-agent");
+const {SocksProxyAgent} = require("socks-proxy-agent");
 
 function registerHandlers(mainWindow) {
-  ipcMain.handle("download-update", async(event, assetUrl, dest) => {
+  ipcMain.handle("download-update", async(event, assetUrl, dest, appConf) => {
     const INSTALL_DIR = "./userData";
 
-    const res = await fetch(assetUrl);
+    const agent = getAgent(appConf);
+
+    const res = agent
+      ? await fetch(assetUrl, {agent})
+      : await fetch(assetUrl);
     if (!res.ok) {throw new Error(`${res.status}`);}
 
     const total = parseInt(res.headers.get("content-length"), 10);
@@ -44,6 +50,18 @@ function registerHandlers(mainWindow) {
       .promise();
     mainWindow.webContents.send("update-done");
   });
+}
+
+function getAgent(appConfig) {
+  let agent = null;
+  if (appConfig.proxyEnabled && appConfig.proxyUrl) {
+    if (appConfig.proxyType === "http" || appConfig.proxyType === "https") {
+      agent = new HttpsProxyAgent(appConfig.proxyUrl);
+    } else if (appConfig.proxyType === "socks") {
+      agent = new SocksProxyAgent(appConfig.proxyUrl);
+    }
+  }
+  return agent;
 }
 
 module.exports = {registerHandlers};

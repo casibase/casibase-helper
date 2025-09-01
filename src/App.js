@@ -20,11 +20,18 @@ import "./assets/App.css";
 import Sidebar from "./components/Sidebar";
 import Titlebar from "./components/Titlebar";
 import HomePage from "./components/HomePage";
+import ConfPage from "./components/ConfPage";
+import {readAppConf} from "./backends/appConf";
+const fs = require("fs-extra");
 
+const USERDATADIR = "./userData";
 const {Content, Sider} = Layout;
 
 function App() {
   const [isUpdating, setIsUpdating] = useState(false);
+  const [appConfig, setAppConfig] = useState(() => readAppConf());
+
+  fs.ensureDir(USERDATADIR);
 
   return (
     <ConfigProvider theme={"default"}>
@@ -41,6 +48,13 @@ function App() {
                   <HomePage
                     setIsUpdating={setIsUpdating}
                     isUpdating={isUpdating}
+                    appConfig={appConfig}
+                  />
+                </Route>
+                <Route path="/config">
+                  <ConfPage
+                    setAppConfig={setAppConfig}
+                    appConfig={appConfig}
                   />
                 </Route>
               </Switch>

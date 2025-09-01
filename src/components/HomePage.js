@@ -23,19 +23,11 @@ import {getLatestVersion, getLocalVersion, update} from "../backends/version";
 const {Title} = Typography;
 
 const HomePage = (
-  {setIsUpdating,
-    isUpdating}
-) => {
-
-  HomePage.propTypes = {
-    setIsUpdating: PropTypes.func,
-    isUpdating: PropTypes.bool,
-  };
-
-  HomePage.defaultProps = {
-    setIsUpdating: () => { },
-    isUpdating: false,
-  };
+  {
+    setIsUpdating,
+    isUpdating,
+    appConfig,
+  }) => {
 
   const {t} = useTranslation();
   const [progress, setProgress] = useState(0);
@@ -65,7 +57,7 @@ const HomePage = (
   async function handleUpdate() {
     setIsUpdating(true);
     try {
-      const localVersion = await update();
+      const localVersion = await update(appConfig);
       setLocalVersion(localVersion);
     } finally {
       setIsUpdating(false);
@@ -108,6 +100,18 @@ const HomePage = (
       </Card>
     </div>
   );
+};
+
+HomePage.propTypes = {
+  setIsUpdating: PropTypes.func,
+  isUpdating: PropTypes.bool,
+  appConfig: PropTypes.object,
+};
+
+HomePage.defaultProps = {
+  setIsUpdating: () => { },
+  isUpdating: false,
+  appConfig: {},
 };
 
 export default HomePage;
