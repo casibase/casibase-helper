@@ -62,7 +62,7 @@ function getAssetName() {
   }
 }
 
-export async function update() {
+export async function update(appConfig) {
   const localVersion = getLocalVersion();
   const release = await getLatestRelease();
   const latestVersion = release.tag_name;
@@ -80,7 +80,8 @@ export async function update() {
   await ipcRenderer.invoke(
     "download-update",
     asset.browser_download_url,
-    zipPath
+    zipPath,
+    appConfig
   );
 
   saveLocalVersion(latestVersion);

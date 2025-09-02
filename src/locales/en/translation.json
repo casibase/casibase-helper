@@ -11,5 +11,11 @@
     "notDownloaded":"Not downloaded",
     "update":"Update",
     "download":"Download"
+  },
+  "appConfig":{
+    "enableProxy":"Enable Proxy",
+    "save":"Save",
+    "proxyType":"Proxy Type",
+    "proxyAddr":"Proxy Address"
   }
 }
