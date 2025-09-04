@@ -8,9 +8,9 @@
       "@semantic-release/github",
       {
         "assets": [
-          {"path": "release/*.exe", "label": "Windows Installer"},
-          {"path": "release/*.dmg", "label": "macOS Installer"},
-          {"path": "release/*.AppImage", "label": "Linux AppImage"}
+          {"path": "release/*.exe"},
+          {"path": "release/*.dmg"},
+          {"path": "release/*.AppImage"}
         ]
       }
     ]

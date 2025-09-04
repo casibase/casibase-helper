@@ -6,7 +6,27 @@ on:
       - master
 
 jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.setver.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: yarn global add semantic-release@17.4.4 @semantic-release/commit-analyzer @semantic-release/release-notes-generator @semantic-release/git @semantic-release/github
+
+      - name: Bump version
+        id: setver
+        run: |
+          VERSION=$(semantic-release --no-ci --dry-run | grep -oP "The next release version is \K[0-9]+\.[0-9]+\.[0-9]+")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
   build:
+    needs: version
     name: Build & Release
     runs-on: ${{ matrix.os }}
     strategy:
@@ -25,6 +45,11 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+
+      - name: Update package.json version
+        if: needs.version.outputs.new_version != ''
+        run: |
+          yarn version --new-version ${{ needs.version.outputs.new_version }} --no-git-tag-version
 
       - name: Build React renderer(Webpack)
         run: yarn build
