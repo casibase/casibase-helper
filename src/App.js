@@ -18,6 +18,7 @@ import {Route, BrowserRouter as Router, Switch} from "react-router-dom";
 import "./i18n";
 import "./assets/App.css";
 import Sidebar from "./components/Sidebar";
+import * as Deploy from './backends/Deploy';
 import Titlebar from "./components/Titlebar";
 import HomePage from "./components/HomePage";
 import ConfPage from "./components/ConfPage";
@@ -30,8 +31,107 @@ const {Content, Sider} = Layout;
 function App() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [appConfig, setAppConfig] = useState(() => readAppConf());
+  const deploySteps = ['srcCheck', 'confCheck', 'deployApp']
+  const [currentStep, setCurrentStep] = useState(0);
+  const [stepsStatus, setStepsStatus] = useState(['wait', 'wait', 'wait']);
+  const [running, setRunning] = useState(false);
+  const [errorInfo, setErrorInfo] = useState(['', '', '']);
+  const [backend, setBackend] = useState(null);
+  const [frontend, setFrontend] = useState(null);
+  
 
   fs.ensureDir(USERDATADIR);
+
+  const runStep = async (index) => {
+    setStepsStatus(prev => {
+      const newStatus = [...prev];
+      newStatus[index] = 'process';
+      return newStatus;
+    });
+    setErrorInfo(prev => {
+      const newErrors = [...prev];
+      newErrors[index] = '';
+      return newErrors;
+    });
+
+    const processureName = deploySteps[index];
+
+    try {
+      let processureResult = false;
+
+      switch (processureName) {
+        case 'srcCheck':
+          processureResult = await Deploy.srcCheck();
+          break;
+        case 'confCheck':
+          processureResult = await Deploy.confCheck();
+          break;
+        case 'deployApp':
+          processureResult = await Deploy.deployApp();
+          break;
+        default:;
+      }
+
+      if (processureResult) {
+        setStepsStatus(prev => {
+          const newStatus = [...prev];
+          newStatus[index] = 'finish';
+          return newStatus;
+        });
+
+        if (index < deploySteps.length - 1) {
+          setCurrentStep(index + 1);
+          runStep(index + 1);
+        } else {
+          // final step, always be deploy app
+          setBackend(processureResult.backend);
+          setFrontend(processureResult.frontend);
+          setRunning(false);
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      setStepsStatus(prev => {
+        const newStatus = [...prev];
+        newStatus[index] = 'error';
+        return newStatus;
+      });
+      setErrorInfo(prev => {
+        const newErrors = [...prev];
+        newErrors[index] = err.message;
+        return newErrors;
+      });
+      setRunning(false);
+    }
+  };
+
+  
+  const stop = () => {
+    backend?.kill();
+    frontend?.close();
+    setBackend(null);
+    setFrontend(null);
+  }
+
+  const handleDeploy = () => {
+    setRunning(true);
+    setStepsStatus(['wait', 'wait', 'wait']);
+    setCurrentStep(0);
+    runStep(0);
+  };
+
+  const handleStop = () => {
+    setStepsStatus(['wait', 'wait', 'wait']);
+    setCurrentStep(0);
+    stop();
+    setRunning(false);
+  };
+
+  const handleRetry = () => {
+    setRunning(true);
+    stop();
+    runStep(currentStep);
+  };
 
   return (
     <ConfigProvider theme={"default"}>
@@ -49,6 +149,14 @@ function App() {
                     setIsUpdating={setIsUpdating}
                     isUpdating={isUpdating}
                     appConfig={appConfig}
+                    stepsStatus={stepsStatus}
+                    currentStep={currentStep}
+                    onDeploy={handleDeploy}
+                    onStop={handleStop}
+                    onRetry={handleRetry}
+                    deploySteps={deploySteps}
+                    running={running}
+                    errorInfo={errorInfo}
                   />
                 </Route>
                 <Route path="/config">
