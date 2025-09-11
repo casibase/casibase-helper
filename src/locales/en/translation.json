@@ -17,5 +17,15 @@
     "save":"Save",
     "proxyType":"Proxy Type",
     "proxyAddr":"Proxy Address"
+  },
+  "steps": {
+    "srcCheck":"Resource Check",
+    "confCheck":"Configuration check",
+    "deployApp":"Depoy Casibase"
+  },
+  "deploy": {
+    "retry":"Retry",
+    "stop":"Stop",
+    "deploy":"Deploy"
   }
 }
