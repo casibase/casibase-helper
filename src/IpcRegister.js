@@ -25,30 +25,36 @@ function registerHandlers(mainWindow) {
 
     const agent = getAgent(appConf);
 
-    const res = agent
+    try {
+      const res = agent
       ? await fetch(assetUrl, {agent})
-      : await fetch(assetUrl);
+        : await fetch(assetUrl);
     if (!res.ok) {throw new Error(`${res.status}`);}
 
-    const total = parseInt(res.headers.get("content-length"), 10);
-    let received = 0;
+      const total = parseInt(res.headers.get("content-length"), 10);
+      let received = 0;
 
-    const fileStream = fs.createWriteStream(dest);
-    await new Promise((resolve, reject) => {
-      res.body.on("data", chunk => {
-        received += chunk.length;
-        const percent = ((received / total) * 100).toFixed(2);
-        mainWindow.webContents.send("download-progress", percent);
+      const fileStream = fs.createWriteStream(dest);
+      await new Promise((resolve, reject) => {
+        res.body.on("data", chunk => {
+          received += chunk.length;
+          const percent = ((received / total) * 100).toFixed(2);
+          mainWindow.webContents.send("download-progress", percent);
+        });
+        res.body.pipe(fileStream);
+        res.body.on("error", reject);
+        fileStream.on("finish", resolve);
       });
-      res.body.pipe(fileStream);
-      res.body.on("error", reject);
-      fileStream.on("finish", resolve);
-    });
 
-    await fs.createReadStream(dest)
+      await fs.createReadStream(dest)
       .pipe(unzipper.Extract({path: INSTALL_DIR}))
-      .promise();
-    mainWindow.webContents.send("update-done");
+        .promise();
+      mainWindow.webContents.send("update-done");
+    }
+    catch (error) { 
+      mainWindow.webContents.send("download-error", error.message);
+      return Promise.reject(new Error(error.message));
+    }
   });
 }
 
