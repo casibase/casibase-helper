@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, { useEffect, useState } from "react";
-import { Button, Card, Space, Spin, Tag, Typography, Steps, Progress } from "antd";
+import { Button, Card, Space, Spin, Tag, Typography, Steps, Progress, message } from "antd";
 import PropTypes from "prop-types";
 import { CheckCircleTwoTone, CloseCircleTwoTone, SyncOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
@@ -45,6 +45,10 @@ const HomePage = (
   const [checkingVersion, setCheckingVersion] = useState(true);
 
   useEffect(async () => {
+    ipcRenderer.on("download-error", (event, errorMessage) => {
+      setIsUpdating(false);
+      message.error(errorMessage)
+    });
     ipcRenderer.on("download-progress", (_, percent) => {
       setProgress(percent);
     });
