@@ -67,7 +67,7 @@ function createWindow() {
 
   mainWindow.loadURL(indexPath)
 
-  registerHandlers(mainWindow)
+  registerHandlers(mainWindow, indexPath)
 
   mainWindow.once("ready-to-show", () => {
     mainWindow.show()

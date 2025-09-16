@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import React, { useEffect, useState } from "react";
-import { Button, Card, Space, Spin, Tag, Typography, Steps, Progress, message } from "antd";
+import { Button, Card, Space, Spin, Tag, Tooltip, Typography, Steps, Progress, message } from "antd";
 import PropTypes from "prop-types";
-import { CheckCircleTwoTone, CloseCircleTwoTone, SyncOutlined } from "@ant-design/icons";
+import { CheckCircleTwoTone, CloseCircleTwoTone, SyncOutlined, FileTextOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 const { ipcRenderer } = window.require("electron");
 import { getLatestVersion, getLocalVersion, update } from "../backends/version";
@@ -112,7 +112,19 @@ const HomePage = (
         )}
       </Card>
 
-      <Card style={{ marginBottom: 24 }}>
+      <Card
+        style={{ marginBottom: 24 }}
+        extra={
+          <Tooltip title={t("logs.log")}>
+            <Button
+              type="text"
+              shape="circle"
+              icon={<FileTextOutlined />}
+              onClick={() => ipcRenderer.send("open-log-window")}
+            />
+          </Tooltip>
+        }
+      >
         <Steps direction="vertical" current={currentStep}>
           {deploySteps.map((title, idx) => (
             <Step

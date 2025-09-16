@@ -27,5 +27,13 @@
     "retry":"Retry",
     "stop":"Stop",
     "deploy":"Deploy"
+  },
+  "logs": {
+    "log": "Log",
+    "all": "All",
+    "normal": "Normal",
+    "error": "Error",
+    "clear": "Clear",
+    "refresh": "Refresh"
   }
 }
