@@ -18,6 +18,7 @@ const path = require('path');
 const { spawn } = require('child_process');
 const http = require('http');
 const serveHandler = require('serve-handler');
+const { ipcRenderer } = require("electron");
 
 export const configPath = './userData/conf/app.conf';
 const binaryPath = './userData/casibase.exe';
@@ -82,7 +83,7 @@ export function deployApp() {
       backend.stdout.on('data', (data) => {
         const msg = data.toString();
         // record log 
-        // console.log(`[Go STDOUT] ${msg.trim()}`);
+        ipcRenderer.send("add-log", 'info', msg.trim());
 
         if (!backendReady && msg.includes('http server Running on')) {
           backendReady = true;
@@ -91,6 +92,7 @@ export function deployApp() {
       });
 
       backend.stderr.on('data', (data) => {
+        ipcRenderer.send("add-log", 'error', data.toString().trim());
         cleanup();
         return reject(new Error(data.toString().trim().split("\n")[0] || ""))
       });
@@ -101,10 +103,12 @@ export function deployApp() {
 
       frontend.listen(3000, () => {
         frontendReady = true;
+        ipcRenderer.send("add-log", 'info', "front end started.");
         checkReady();
       });
 
       frontend.on('error', (err) => {
+        ipcRenderer.send("add-log", 'error', err);
         cleanup();
         return reject(new Error(err))
       });

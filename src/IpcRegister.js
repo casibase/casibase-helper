@@ -18,8 +18,12 @@ const unzipper = require("unzipper");
 const {ipcMain} = require("electron");
 const {HttpsProxyAgent} = require("https-proxy-agent");
 const {SocksProxyAgent} = require("socks-proxy-agent");
+const path = require("path")
+const { addLog, getLogs, clearLogs } = require(path.join(__dirname, "backends/Log"));
+const { app, BrowserWindow } = require("electron");
+const url = require("url")
 
-function registerHandlers(mainWindow) {
+function registerHandlers(mainWindow, indexPath) {
   ipcMain.handle("download-update", async(event, assetUrl, dest, appConf) => {
     const INSTALL_DIR = "./userData";
 
@@ -51,10 +55,45 @@ function registerHandlers(mainWindow) {
         .promise();
       mainWindow.webContents.send("update-done");
     }
-    catch (error) { 
+    catch (error) {
       mainWindow.webContents.send("download-error", error.message);
       return Promise.reject(new Error(error.message));
     }
+  });
+
+  ipcMain.on("open-log-window", () => {
+    let logWindow;
+    if (logWindow) {
+      logWindow.focus();
+      return;
+    }
+    logWindow = new BrowserWindow({
+      width: 800,
+      height: 600,
+      webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false,
+      }
+    });
+    logsPath = indexPath + "#/logs";
+    logWindow.loadURL(logsPath);
+    logWindow.on("closed", () => {
+      logWindow = null;
+    });
+  });
+
+  ipcMain.handle("get-logs", () => getLogs());
+  ipcMain.handle("clear-logs", () => clearLogs());
+  ipcMain.on("add-log", (event, type, message) => {
+    addLog(type, message)
+    BrowserWindow.getAllWindows().forEach(win => {
+    win.webContents.send("new-log", {
+      id: Date.now() + Math.random(),
+      type,
+      message,
+      timestamp: new Date().toISOString()
+    });
+  });
   });
 }
 

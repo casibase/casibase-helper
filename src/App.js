@@ -14,7 +14,7 @@
 
 import React, {useState} from "react";
 import {ConfigProvider, Layout} from "antd";
-import {Route, BrowserRouter as Router, Switch} from "react-router-dom";
+import { HashRouter, Route, Switch } from "react-router-dom";
 import "./i18n";
 import "./assets/App.css";
 import Sidebar from "./components/Sidebar";
@@ -22,6 +22,7 @@ import * as Deploy from './backends/Deploy';
 import Titlebar from "./components/Titlebar";
 import HomePage from "./components/HomePage";
 import ConfPage from "./components/ConfPage";
+import LogPage from "./components/LogPage";
 import {readAppConf} from "./backends/appConf";
 const fs = require("fs-extra");
 
@@ -135,7 +136,12 @@ function App() {
 
   return (
     <ConfigProvider theme={"default"}>
-      <Router>
+      <HashRouter>
+    <Switch>
+      <Route path="/logs">
+        <LogPage />
+      </Route>
+      <Route>
         <Layout>
           <Titlebar />
           <Layout>
@@ -169,7 +175,9 @@ function App() {
             </Content>
           </Layout>
         </Layout>
-      </Router>
+      </Route>
+    </Switch>
+  </HashRouter>
     </ConfigProvider>
   );
 }

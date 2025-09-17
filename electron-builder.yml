@@ -10,6 +10,7 @@ files:
   - "dist/**"
   - "main.js"
   - "src/IpcRegister.js"
+  - "src/backends/Log.js"
   - "src/locales/**"
 
 extraResources:
