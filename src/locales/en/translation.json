@@ -5,7 +5,7 @@
     "Config":"Config"
   },
   "version": {
-    "casibaseVersion":"Casibase Version",
+    "casibase":"Casibase",
     "currentVersion":"Current Version",
     "latestVersion":"Latest Version",
     "notDownloaded":"Not downloaded",
@@ -21,7 +21,7 @@
   "steps": {
     "srcCheck":"Resource Check",
     "confCheck":"Configuration check",
-    "deployApp":"Depoy Casibase"
+    "deployApp":"Depoly"
   },
   "deploy": {
     "retry":"Retry",

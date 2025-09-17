@@ -79,41 +79,43 @@ const HomePage = (
 
   return (
     <div style={{ padding: 24, height: "100vh" }}>
-      <Card style={{ marginBottom: 24 }}>
-        <Space align="center">
-          <Title level={4} style={{ margin: 0 }}>{t("version.casibaseVersion")}</Title>
-          {checkingVersion ? (
-            <Spin size="small" />
-          ) : localVersion ? (
-            <>
-              <Tag color="blue">{t("version.currentVersion")}:{localVersion}</Tag>
-              {latestVersion && latestVersion !== localVersion && (
-                <>
-                  <Tag color="orange">{t("version.latestVersion")}:{latestVersion}</Tag>
-                  <Button size="small" type="primary" onClick={handleUpdate}>
-                    {t("version.update")}
-                  </Button>
-                </>
-              )}
-            </>
-          ) : (
-            <>
-              <Tag color="red">{t("version.notDownloaded")}</Tag>
-              {!isUpdating && (
-                <Button size="small" type="primary" onClick={handleUpdate}>
-                  {t("version.download")}
-                </Button>
-              )}
-            </>
-          )}
-        </Space>
-        {isUpdating && (
-          <Progress percent={progress} status={"active"} />
-        )}
-      </Card>
-
       <Card
         style={{ marginBottom: 24 }}
+        title={
+          <Space align="center">
+            <Title level={4} style={{ margin: 0 }}>
+              {t("version.casibase")}
+            </Title>
+            {checkingVersion ? (
+              <Spin size="small" />
+            ) : localVersion ? (
+              <>
+                <Tag color="blue">
+                  {t("version.currentVersion")}: {localVersion}
+                </Tag>
+                {latestVersion && latestVersion !== localVersion && (
+                  <>
+                    <Tag color="orange">
+                      {t("version.latestVersion")}: {latestVersion}
+                    </Tag>
+                    <Button size="small" type="primary" onClick={handleUpdate}>
+                      {t("version.update")}
+                    </Button>
+                  </>
+                )}
+              </>
+            ) : (
+              <>
+                <Tag color="red">{t("version.notDownloaded")}</Tag>
+                {!isUpdating && (
+                  <Button size="small" type="primary" onClick={handleUpdate}>
+                    {t("version.download")}
+                  </Button>
+                )}
+              </>
+            )}
+          </Space>
+        }
         extra={
           <Tooltip title={t("logs.log")}>
             <Button
