@@ -18,7 +18,7 @@ import {Button, Card, Form, Input, Select, Switch} from "antd";
 import {persistAppConf} from "../backends/appConf";
 import {useTranslation} from "react-i18next";
 
-const ConfPage = ({
+const SettingPage = ({
   setAppConfig,
   appConfig,
 }) => {
@@ -116,14 +116,14 @@ const ConfPage = ({
   );
 };
 
-ConfPage.propTypes = {
+SettingPage.propTypes = {
   setAppConfig: PropTypes.func,
   appConfig: PropTypes.object,
 };
 
-ConfPage.defaultProps = {
+SettingPage.defaultProps = {
   setAppConfig: () => { },
   appConfig: {},
 };
 
-export default ConfPage;
+export default SettingPage;

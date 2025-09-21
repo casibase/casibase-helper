@@ -2,7 +2,7 @@
   "sidebar": {
     "Home":"Home",
     "Logs":"Logs",
-    "Config":"Config"
+    "Setting":"Setting"
   },
   "version": {
     "casibase":"Casibase",
@@ -35,5 +35,15 @@
     "error": "Error",
     "clear": "Clear",
     "refresh": "Refresh"
+  },
+  "config": {
+    "Config": "Config",
+    "Casibase Config": "Casibase Config",
+    "Reload config": "Reload config",
+    "Save": "Save",
+    "Custom": "Custom",
+    "Config Saved": "Config Saved",
+    "Failed To Save": "Failed to save",
+    "Failed To Load Config": "Failed to load config"
   }
 }

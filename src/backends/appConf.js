@@ -14,8 +14,9 @@
 
 const fs = require("fs-extra");
 const path = require("path");
+import {appPath} from './Deploy'
 
-const CONFIG_PATH = path.join("./userData/config.json");
+const CONFIG_PATH = path.join(appPath, "config.json");
 
 export function readAppConf() {
   if (!fs.existsSync(CONFIG_PATH)) {

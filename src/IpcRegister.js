@@ -25,7 +25,7 @@ const url = require("url")
 
 function registerHandlers(mainWindow, indexPath) {
   ipcMain.handle("download-update", async(event, assetUrl, dest, appConf) => {
-    const INSTALL_DIR = "./userData";
+    const INSTALL_DIR = app.getPath("userData");
 
     const agent = getAgent(appConf);
 
@@ -87,13 +87,17 @@ function registerHandlers(mainWindow, indexPath) {
   ipcMain.on("add-log", (event, type, message) => {
     addLog(type, message)
     BrowserWindow.getAllWindows().forEach(win => {
-    win.webContents.send("new-log", {
-      id: Date.now() + Math.random(),
-      type,
-      message,
-      timestamp: new Date().toISOString()
+      win.webContents.send("new-log", {
+        id: Date.now() + Math.random(),
+        type,
+        message,
+        timestamp: new Date().toISOString()
+      });
     });
   });
+
+  ipcMain.handle("get-app-path", () => {
+    return app.getPath("userData");
   });
 }
 
