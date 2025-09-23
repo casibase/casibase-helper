@@ -34,8 +34,14 @@ export async function readAppConf() {
   });
 }
 
-export function saveAppConf(content) {
-  const Conf = Object.entries(content).map(([k, v]) => `${k} = ${v}`).join('\n');
-  fs.writeFileSync(configPath, Conf, 'utf-8');
+export async function saveAppConf(content) {
+  const currentConf = await readAppConf()
+  content.forEach(({ key, value }) => {
+    if (key in currentConf) {
+      currentConf[key] = value;
+    }
+  })
+  const newConf = Object.entries(currentConf).map(([k, v]) => `${k} = ${v}`).join('\n');
+  fs.writeFileSync(configPath, newConf, 'utf-8');
   return true;
 }

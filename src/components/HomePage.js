@@ -20,6 +20,7 @@ import { useTranslation } from "react-i18next";
 const { ipcRenderer } = window.require("electron");
 import { getLatestVersion, getLocalVersion, update } from "../backends/version";
 import { Link } from "react-router-dom";
+import { readAppConf, saveAppConf } from '../backends/Conf';
 
 const { Title } = Typography;
 const { Step } = Steps;
@@ -69,9 +70,20 @@ const HomePage = (
 
   async function handleUpdate() {
     setIsUpdating(true);
+    let existConf = []
+    try {
+      existConf = await readAppConf();
+    }catch(err){
+      existConf = [
+        {key:'driverName', value:'sqlite'},
+        {key:'dataSourceName', value:'./database.sqlite'},
+        {key:'dbName', value:'casibase'},
+      ]
+    }
     try {
       const localVersion = await update(appConfig);
       setLocalVersion(localVersion);
+      await saveAppConf(existConf)
     } finally {
       setIsUpdating(false);
     }
