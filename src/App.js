@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, {useState} from "react";
-import {ConfigProvider, Layout} from "antd";
+import React, { useState } from "react";
+import { ConfigProvider, Layout } from "antd";
 import { HashRouter, Route, Switch } from "react-router-dom";
 import "./i18n";
 import "./assets/App.css";
@@ -21,13 +21,15 @@ import Sidebar from "./components/Sidebar";
 import * as Deploy from './backends/Deploy';
 import Titlebar from "./components/Titlebar";
 import HomePage from "./components/HomePage";
-import ConfPage from "./components/ConfPage";
+import SettingPage from "./components/SettingPage";
+import ConfigPage from "./components/ConfigPage";
 import LogPage from "./components/LogPage";
-import {readAppConf} from "./backends/appConf";
+import { readAppConf } from "./backends/appConf";
 const fs = require("fs-extra");
+const { ipcRenderer, app } = require("electron");
 
-const USERDATADIR = "./userData";
-const {Content, Sider} = Layout;
+const USERDATADIR = await ipcRenderer.invoke("get-app-path");
+const { Content, Sider } = Layout;
 
 function App() {
   const [isUpdating, setIsUpdating] = useState(false);
@@ -39,7 +41,6 @@ function App() {
   const [errorInfo, setErrorInfo] = useState(['', '', '']);
   const [backend, setBackend] = useState(null);
   const [frontend, setFrontend] = useState(null);
-  
 
   fs.ensureDir(USERDATADIR);
 
@@ -70,7 +71,7 @@ function App() {
         case 'deployApp':
           processureResult = await Deploy.deployApp();
           break;
-        default:;
+        default: ;
       }
 
       if (processureResult) {
@@ -106,7 +107,7 @@ function App() {
     }
   };
 
-  
+
   const stop = () => {
     backend?.kill();
     frontend?.close();
@@ -137,47 +138,50 @@ function App() {
   return (
     <ConfigProvider theme={"default"}>
       <HashRouter>
-    <Switch>
-      <Route path="/logs">
-        <LogPage />
-      </Route>
-      <Route>
-        <Layout>
-          <Titlebar />
-          <Layout>
-            <Sider collapsible>
-              <Sidebar />
-            </Sider>
-            <Content>
-              <Switch>
-                <Route exact path="/">
-                  <HomePage
-                    setIsUpdating={setIsUpdating}
-                    isUpdating={isUpdating}
-                    appConfig={appConfig}
-                    stepsStatus={stepsStatus}
-                    currentStep={currentStep}
-                    onDeploy={handleDeploy}
-                    onStop={handleStop}
-                    onRetry={handleRetry}
-                    deploySteps={deploySteps}
-                    running={running}
-                    errorInfo={errorInfo}
-                  />
-                </Route>
-                <Route path="/config">
-                  <ConfPage
-                    setAppConfig={setAppConfig}
-                    appConfig={appConfig}
-                  />
-                </Route>
-              </Switch>
-            </Content>
-          </Layout>
-        </Layout>
-      </Route>
-    </Switch>
-  </HashRouter>
+        <Switch>
+          <Route path="/logs">
+            <LogPage />
+          </Route>
+          <Route>
+            <Layout>
+              <Titlebar />
+              <Layout>
+                <Sider collapsible>
+                  <Sidebar />
+                </Sider>
+                <Content>
+                  <Switch>
+                    <Route exact path="/">
+                      <HomePage
+                        setIsUpdating={setIsUpdating}
+                        isUpdating={isUpdating}
+                        appConfig={appConfig}
+                        stepsStatus={stepsStatus}
+                        currentStep={currentStep}
+                        onDeploy={handleDeploy}
+                        onStop={handleStop}
+                        onRetry={handleRetry}
+                        deploySteps={deploySteps}
+                        running={running}
+                        errorInfo={errorInfo}
+                      />
+                    </Route>
+                    <Route path="/setting">
+                      <SettingPage
+                        setAppConfig={setAppConfig}
+                        appConfig={appConfig}
+                      />
+                    </Route>
+                    <Route path="/config">
+                      <ConfigPage />
+                    </Route>
+                  </Switch>
+                </Content>
+              </Layout>
+            </Layout>
+          </Route>
+        </Switch>
+      </HashRouter>
     </ConfigProvider>
   );
 }

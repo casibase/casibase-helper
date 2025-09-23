@@ -20,10 +20,18 @@ const http = require('http');
 const serveHandler = require('serve-handler');
 const { ipcRenderer } = require("electron");
 
-export const configPath = './userData/conf/app.conf';
-const binaryPath = './userData/casibase.exe';
-const dataPath = './userData/data';
-const staticPath = './userData/web/build';
+export const appPath = await ipcRenderer.invoke("get-app-path");
+
+const configDirPath = path.join(appPath, "conf")
+export const configPath = path.join(configDirPath, "app.conf")
+const binaryPath = path.join(appPath, "casibase.exe")
+const dataPath = path.join(appPath, "data")
+const staticPath = path.join(appPath, "web/build")
+
+
+if (!fs.existsSync(configDirPath)) {
+  fs.mkdirSync(configDirPath, { recursive: true });
+}
 
 export function srcCheck() {
   return new Promise(async (resolve, reject) => {

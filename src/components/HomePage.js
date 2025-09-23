@@ -15,10 +15,11 @@
 import React, { useEffect, useState } from "react";
 import { Button, Card, Space, Spin, Tag, Tooltip, Typography, Steps, Progress, message } from "antd";
 import PropTypes from "prop-types";
-import { CheckCircleTwoTone, CloseCircleTwoTone, SyncOutlined, FileTextOutlined } from "@ant-design/icons";
+import { CheckCircleTwoTone, CloseCircleTwoTone, SyncOutlined, FileTextOutlined, SettingOutlined } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 const { ipcRenderer } = window.require("electron");
 import { getLatestVersion, getLocalVersion, update } from "../backends/version";
+import { Link } from "react-router-dom";
 
 const { Title } = Typography;
 const { Step } = Steps;
@@ -37,7 +38,6 @@ const HomePage = (
     running,
     errorInfo,
   }) => {
-
   const { t } = useTranslation();
   const [progress, setProgress] = useState(0);
   const [localVersion, setLocalVersion] = useState(null);
@@ -117,14 +117,25 @@ const HomePage = (
           </Space>
         }
         extra={
-          <Tooltip title={t("logs.log")}>
-            <Button
-              type="text"
-              shape="circle"
-              icon={<FileTextOutlined />}
-              onClick={() => ipcRenderer.send("open-log-window")}
-            />
-          </Tooltip>
+          <>
+            <Tooltip title={t("logs.log")}>
+              <Button
+                type="text"
+                shape="circle"
+                icon={<FileTextOutlined />}
+                onClick={() => ipcRenderer.send("open-log-window")}
+              />
+            </Tooltip>
+            <Link to="/config">
+              <Tooltip title={t("config.Config")}>
+                <Button
+                  type="text"
+                  shape="circle"
+                  icon={<SettingOutlined />}
+                />
+              </Tooltip>
+            </Link>
+          </>
         }
       >
         <Steps direction="vertical" current={currentStep}>

@@ -30,9 +30,9 @@ const Sidebar = () => {
       label: <Link to="/">{t("sidebar.Home")}</Link>,
     },
     {
-      key: "/config",
+      key: "/setting",
       icon: <SettingOutlined />,
-      label: <Link to="/config">{t("sidebar.Config")}</Link>,
+      label: <Link to="/setting">{t("sidebar.Setting")}</Link>,
     }
   ];
 
