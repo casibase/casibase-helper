@@ -75,17 +75,12 @@ const ConfigPage = () => {
   const handleSave = async () => {
     setLoading(true);
     try {
-      filteredConfig.forEach(({ key, value }) => {
-        if (key in config) {
-          config[key] = value;
-        }
-      })
       if (dbType === 'sqlite') {
-        config['driverName'] = 'sqlite';
-        config['dataSourceName'] = './database.sqlite';
-        config['dbName'] = 'casibase';
+        changeConfigValue('driverName','sqlite')
+        changeConfigValue('dataSourceName','./database.sqlite')
+        changeConfigValue('dbName','casibase')
       }
-      await saveAppConf(config);
+      await saveAppConf(filteredConfig);
       messageApi.success(t('config.Config Saved'));
     } catch (err) {
       messageApi.error(`${t('config.Failed To Save')}:${err.message}`);
@@ -93,6 +88,13 @@ const ConfigPage = () => {
       setLoading(false);
     }
   };
+
+  const changeConfigValue = (targetKey, newValue) => {
+    let targetItem = filteredConfig.find(item => item.key === targetKey);
+    if (targetItem) {
+      targetItem.value = newValue;
+    }
+  }
 
   const changeDbType = (newDbType) => {
     setDbType(newDbType);
