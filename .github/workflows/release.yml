@@ -15,7 +15,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: yarn global add semantic-release@17.4.4 @semantic-release/commit-analyzer @semantic-release/release-notes-generator @semantic-release/git @semantic-release/github
+      - run: yarn global add semantic-release@17.4.4 @semantic-release/commit-analyzer @semantic-release/release-notes-generator @semantic-release/git @semantic-release/github@11.0.6
 
       - name: Bump version
         id: setver
@@ -109,6 +109,6 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Release
-        run: yarn global add semantic-release@17.4.4 @semantic-release/commit-analyzer @semantic-release/release-notes-generator @semantic-release/git @semantic-release/github && semantic-release
+        run: yarn global add semantic-release@17.4.4 @semantic-release/commit-analyzer @semantic-release/release-notes-generator @semantic-release/git @semantic-release/github@11.0.6 && semantic-release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
