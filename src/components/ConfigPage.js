@@ -187,7 +187,6 @@ const ConfigPage = () => {
       >
         <div
           style={{flex: 1, overflow: "auto", bottom: "30px", padding: 0, marginBottom: 36}}
-          styles={{body: {dpadding: 0, height: "100%"}}}
         >
           <Table
             dataSource={dataSource}

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-"use strict"
-const { app, BrowserWindow, ipcMain } = require("electron")
+"use strict";
+const {app, BrowserWindow, ipcMain} = require("electron");
 const path = require("path")
 const url = require("url")
 const {registerHandlers} = require("./src/IpcRegister")
@@ -44,50 +44,50 @@ function createWindow() {
     frame: false,
     webPreferences: {
       nodeIntegration: true,
-      contextIsolation: false
-    }
-  })
+      contextIsolation: false,
+    },
+  });
 
-  let indexPath
+  let indexPath;
 
   if (dev && process.argv.indexOf("--noDevServer") === -1) {
     indexPath = url.format({
       protocol: "http:",
       host: "localhost:8080",
       pathname: "index.html",
-      slashes: true
-    })
+      slashes: true,
+    });
   } else {
     indexPath = url.format({
       protocol: "file:",
       pathname: path.join(__dirname, "dist", "index.html"),
-      slashes: true
-    })
+      slashes: true,
+    });
   }
 
-  mainWindow.loadURL(indexPath)
+  mainWindow.loadURL(indexPath);
 
-  registerHandlers(mainWindow, indexPath)
+  registerHandlers(mainWindow, indexPath);
 
   mainWindow.once("ready-to-show", () => {
-    mainWindow.show()
-  })
+    mainWindow.show();
+  });
 
-  mainWindow.on("closed", function () {
-    mainWindow = null
-  })
+  mainWindow.on("closed", function() {
+    mainWindow = null;
+  });
 }
 
-app.on("ready", createWindow)
+app.on("ready", createWindow);
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
-    app.quit()
+    app.quit();
   }
-})
+});
 
 app.on("activate", () => {
   if (mainWindow === null) {
-    createWindow()
+    createWindow();
   }
-})
+});

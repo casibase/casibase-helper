@@ -21,7 +21,6 @@ const {SocksProxyAgent} = require("socks-proxy-agent");
 const path = require("path");
 const {addLog, getLogs, clearLogs} = require(path.join(__dirname, "backends/Log"));
 const {app, BrowserWindow} = require("electron");
-const url = require("url");
 
 function registerHandlers(mainWindow, indexPath) {
   ipcMain.handle("download-update", async(event, assetUrl, dest, appConf) => {

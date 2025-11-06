@@ -26,7 +26,7 @@ import ConfigPage from "./components/ConfigPage";
 import LogPage from "./components/LogPage";
 import {readAppConf} from "./backends/appConf";
 const fs = require("fs-extra");
-const {ipcRenderer, app} = require("electron");
+const {ipcRenderer} = require("electron");
 
 const USERDATADIR = await ipcRenderer.invoke("get-app-path");
 const {Content, Sider} = Layout;
@@ -92,7 +92,7 @@ function App() {
         }
       }
     } catch (err) {
-      console.error(err);
+      ipcRenderer.send("add-log", "error", err.message);
       setStepsStatus(prev => {
         const newStatus = [...prev];
         newStatus[index] = "error";

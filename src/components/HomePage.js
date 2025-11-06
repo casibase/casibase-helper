@@ -40,7 +40,6 @@ const HomePage = (
     errorInfo,
   }) => {
   const {t} = useTranslation();
-  const [progress, setProgress] = useState(0);
   const [localVersion, setLocalVersion] = useState(null);
   const [latestVersion, setLatestVersion] = useState(null);
   const [checkingVersion, setCheckingVersion] = useState(true);
@@ -50,8 +49,8 @@ const HomePage = (
       setIsUpdating(false);
       message.error(errorMessage);
     });
-    ipcRenderer.on("download-progress", (_, percent) => {
-      setProgress(percent);
+    ipcRenderer.on("download-progress", () => {
+      // Progress tracking would be implemented here
     });
     await checkUpdate();
     return () => {
@@ -73,7 +72,7 @@ const HomePage = (
     let existConf = [];
     try {
       existConf = await readAppConf();
-    } catch (err) {
+    } catch {
       existConf = [
         {key: "driverName", value: "sqlite"},
         {key: "dataSourceName", value: "./database.sqlite"},

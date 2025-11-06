@@ -39,7 +39,7 @@ export function srcCheck() {
       const staticExists = fs.existsSync(staticPath);
       const dataExists = fs.existsSync(dataPath);
 
-      if (binaryExists && staticExists & dataExists) {
+      if (binaryExists && staticExists && dataExists) {
         return resolve(true);
       } else {
         return reject(new Error("resources not found"));
