@@ -77,11 +77,8 @@ module.exports = {
       )
         .on("close", () => process.exit(0))
         .on("error", spawnError => {
-          // Log error in a way that doesn't use console.error in production
-          if (process.env.NODE_ENV === "development") {
-            // eslint-disable-next-line no-console
-            console.error(spawnError);
-          }
+          // eslint-disable-next-line no-console
+          console.error(spawnError);
         });
     },
   },
