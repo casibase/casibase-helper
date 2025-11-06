@@ -12,22 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {configPath} from './Deploy'
-const fs = require('fs');
+import {configPath} from "./Deploy";
+const fs = require("fs");
 const fsPromises = fs.promises;
 
 export async function readAppConf() {
-  return new Promise(async (resolve, reject) => {
-    if (!fs.existsSync(configPath)) return reject(new Error("Config file is not exist"));
+  return new Promise(async(resolve, reject) => {
+    if (!fs.existsSync(configPath)) {return reject(new Error("Config file is not exist"));}
 
-    const txt = await fsPromises.readFile(configPath, 'utf-8')
+    const txt = await fsPromises.readFile(configPath, "utf-8");
     const lines = txt
       .split(/\r?\n/)
-      .filter(line => line.trim() && !line.startsWith('#'))
+      .filter(line => line.trim() && !line.startsWith("#"))
       .filter(Boolean);
     const obj = {};
     lines.forEach(line => {
-      const [k, v] = line.split('=').map(s => s.trim());
+      const [k, v] = line.split("=").map(s => s.trim());
       obj[k] = v;
     });
     return resolve(obj);
@@ -35,13 +35,13 @@ export async function readAppConf() {
 }
 
 export async function saveAppConf(content) {
-  const currentConf = await readAppConf()
-  content.forEach(({ key, value }) => {
+  const currentConf = await readAppConf();
+  content.forEach(({key, value}) => {
     if (key in currentConf) {
       currentConf[key] = value;
     }
-  })
-  const newConf = Object.entries(currentConf).map(([k, v]) => `${k} = ${v}`).join('\n');
-  fs.writeFileSync(configPath, newConf, 'utf-8');
+  });
+  const newConf = Object.entries(currentConf).map(([k, v]) => `${k} = ${v}`).join("\n");
+  fs.writeFileSync(configPath, newConf, "utf-8");
   return true;
 }

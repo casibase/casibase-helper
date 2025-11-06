@@ -12,32 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { useTranslation } from "react-i18next";
-import React, { useEffect, useState } from 'react';
-import { Table, Input, Button, Form, Space, Typography, message, Card, Segmented } from 'antd';
-import { EditOutlined, SaveOutlined, ReloadOutlined } from '@ant-design/icons';
-import { readAppConf, saveAppConf } from '../backends/Conf';
+import {useTranslation} from "react-i18next";
+import React, {useEffect, useState} from "react";
+import {Button, Card, Input, Segmented, Space, Table, Typography, message} from "antd";
+import {ReloadOutlined, SaveOutlined} from "@ant-design/icons";
+import {readAppConf, saveAppConf} from "../backends/Conf";
 
 const ConfigPage = () => {
-  const { t } = useTranslation();
+  const {t} = useTranslation();
   const [messageApi, contextHolder] = message.useMessage();
   const [config, setConfig] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [dbType, setDbType] = useState('sqlite');
+  const [dbType, setDbType] = useState("sqlite");
   const [filteredConfig, setFilteredConfig] = useState([]);
-  const hiddenKeys = ['driverName', 'dataSourceName', 'dbName'];
-  const priorityKeys = ["driverName", 'dataSourceName', 'dbName'];
+  const hiddenKeys = ["driverName", "dataSourceName", "dbName"];
+  const priorityKeys = ["driverName", "dataSourceName", "dbName"];
 
-  const fetchConfig = async () => {
+  const fetchConfig = async() => {
     setLoading(true);
     try {
       const conf = await readAppConf();
       setConfig(conf);
-      setDbType(conf.driverName === 'sqlite' ? 'sqlite' : 'custom');
+      setDbType(conf.driverName === "sqlite" ? "sqlite" : "custom");
       const filtered = getFilteredConfig(conf.driverName, conf);
       setFilteredConfig(filtered);
     } catch (err) {
-      messageApi.error(`${t('config.Failed To Load Config')}:${err.message}`);
+      messageApi.error(`${t("config.Failed To Load Config")}:${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -52,60 +52,60 @@ const ConfigPage = () => {
       conf = config;
     }
     let filtered = [];
-    if (DbType === 'sqlite') {
+    if (DbType === "sqlite") {
       filtered = Object.entries(conf)
         .filter(([k]) => !hiddenKeys.includes(k))
-        .map(([key, value]) => ({ key, value }));
+        .map(([key, value]) => ({key, value}));
     } else {
       filtered = Object.entries(conf)
-        .map(([key, value]) => ({ key, value }))
+        .map(([key, value]) => ({key, value}))
         // sort priorityKeys
         .sort((a, b) => {
           const ai = priorityKeys.indexOf(a.key);
           const bi = priorityKeys.indexOf(b.key);
-          if (ai === -1 && bi === -1) return 0;
-          if (ai === -1) return 1;
-          if (bi === -1) return -1;
+          if (ai === -1 && bi === -1) {return 0;}
+          if (ai === -1) {return 1;}
+          if (bi === -1) {return -1;}
           return ai - bi;
         });
     }
     return filtered;
-  }
+  };
 
-  const handleSave = async () => {
+  const handleSave = async() => {
     setLoading(true);
     try {
-      if (dbType === 'sqlite') {
-        changeConfigValue('driverName','sqlite')
-        changeConfigValue('dataSourceName','./database.sqlite')
-        changeConfigValue('dbName','casibase')
+      if (dbType === "sqlite") {
+        changeConfigValue("driverName", "sqlite");
+        changeConfigValue("dataSourceName", "./database.sqlite");
+        changeConfigValue("dbName", "casibase");
       }
       await saveAppConf(filteredConfig);
-      messageApi.success(t('config.Config Saved'));
+      messageApi.success(t("config.Config Saved"));
     } catch (err) {
-      messageApi.error(`${t('config.Failed To Save')}:${err.message}`);
+      messageApi.error(`${t("config.Failed To Save")}:${err.message}`);
     } finally {
       setLoading(false);
     }
   };
 
   const changeConfigValue = (targetKey, newValue) => {
-    let targetItem = filteredConfig.find(item => item.key === targetKey);
+    const targetItem = filteredConfig.find(item => item.key === targetKey);
     if (targetItem) {
       targetItem.value = newValue;
     }
-  }
+  };
 
   const changeDbType = (newDbType) => {
     setDbType(newDbType);
     const filtered = getFilteredConfig(newDbType);
     setFilteredConfig(filtered);
-  }
+  };
 
   const getTableData = () => {
     const data = [
       {
-        key: 'dbType',
+        key: "dbType",
         value: dbType,
       },
     ];
@@ -116,22 +116,22 @@ const ConfigPage = () => {
 
   const columns = [
     {
-      dataIndex: 'key',
-      key: 'key',
-      width: '40%',
+      dataIndex: "key",
+      key: "key",
+      width: "40%",
       render: (text) => <Typography.Text strong>{text}</Typography.Text>,
     },
     {
-      dataIndex: 'value',
-      key: 'value',
-      width: '60%',
+      dataIndex: "value",
+      key: "value",
+      width: "60%",
       render: (text, record, index) => {
-        if (record.key === 'dbType') {
+        if (record.key === "dbType") {
           return (
             <Segmented
               options={[
-                { label: t('config.Custom'), value: 'custom' },
-                { label: 'SQLite', value: 'sqlite' },
+                {label: t("config.Custom"), value: "custom"},
+                {label: "SQLite", value: "sqlite"},
               ]}
               value={dbType}
               onChange={changeDbType}
@@ -155,16 +155,16 @@ const ConfigPage = () => {
 
   const dataSource = getTableData().map((item, i) => ({
     ...item,
-    id: item.key + '-' + i,
+    id: item.key + "-" + i,
   }));
 
   return (
     <div>
       {contextHolder}
       <Card
-        style={{ height: '100vh', padding: 0, boxSizing: 'border-box', margin: 0 }}
-        styles={{ body: { display: 'flex', flexDirection: 'column', height: '100%' } }}
-        title={t('config.Casibase Config')}
+        style={{height: "100vh", padding: 0, boxSizing: "border-box", margin: 0}}
+        styles={{body: {display: "flex", flexDirection: "column", height: "100%"}}}
+        title={t("config.Casibase Config")}
         extra={
           <Space>
             <Button
@@ -172,7 +172,7 @@ const ConfigPage = () => {
               onClick={fetchConfig}
               loading={loading}
             >
-              {t('config.Reload config')}
+              {t("config.Reload config")}
             </Button>
             <Button
               type="primary"
@@ -180,26 +180,26 @@ const ConfigPage = () => {
               onClick={handleSave}
               loading={loading}
             >
-              {t('config.Save')}
+              {t("config.Save")}
             </Button>
           </Space>
         }
       >
         <div
-          style={{ flex: 1, overflow: 'auto', bottom: "30px", padding: 0, marginBottom: 36 }}
-          styles={{ body: { dpadding: 0, height: '100%' } }}
+          style={{flex: 1, overflow: "auto", bottom: "30px", padding: 0, marginBottom: 36}}
+          styles={{body: {dpadding: 0, height: "100%"}}}
         >
           <Table
             dataSource={dataSource}
             columns={columns}
             showHeader={false}
             pagination={false}
-            rowKey='id'
+            rowKey="id"
           />
         </div>
       </Card>
     </div>
   );
-}
+};
 
-export default ConfigPage
+export default ConfigPage;
