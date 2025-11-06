@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const webpack = require('webpack')
-const path = require('path')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const { spawn } = require('child_process')
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+const webpack = require("webpack");
+const path = require("path");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const {spawn} = require("child_process");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 
-const defaultInclude = path.resolve(__dirname, 'src')
+const defaultInclude = path.resolve(__dirname, "src");
 
 module.exports = {
   module: {
@@ -26,57 +26,60 @@ module.exports = {
       {
         test: /\.css$/,
         use: [
-          { loader: 'style-loader' },
-          { loader: 'css-loader' }
+          {loader: "style-loader"},
+          {loader: "css-loader"},
         ],
-        include: defaultInclude
+        include: defaultInclude,
       },
       {
         test: /\.jsx?$/,
-        use: [{ loader: 'babel-loader' }],
-        include: defaultInclude
+        use: [{loader: "babel-loader"}],
+        include: defaultInclude,
       },
       {
         test: /\.(jpe?g|png|gif)$/,
-        use: [{ loader: 'file-loader?name=img/[name]__[hash:base64:5].[ext]' }],
-        include: defaultInclude
+        use: [{loader: "file-loader?name=img/[name]__[hash:base64:5].[ext]"}],
+        include: defaultInclude,
       },
       {
         test: /\.(eot|svg|ttf|woff|woff2)$/,
-        use: [{ loader: 'file-loader?name=font/[name]__[hash:base64:5].[ext]' }],
-        include: defaultInclude
-      }
-    ]
+        use: [{loader: "file-loader?name=font/[name]__[hash:base64:5].[ext]"}],
+        include: defaultInclude,
+      },
+    ],
   },
-  target: 'electron-renderer',
+  target: "electron-renderer",
   plugins: [
-    new HtmlWebpackPlugin({ title: 'Casibase Helper' }),
+    new HtmlWebpackPlugin({title: "Casibase Helper"}),
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify('development')
+      "process.env.NODE_ENV": JSON.stringify("development"),
     }),
     // copy i18n language file
     new CopyWebpackPlugin({
       patterns: [
-        { from: 'src/locales', to: 'locales' }
-      ]
-    })
+        {from: "src/locales", to: "locales"},
+      ],
+    }),
   ],
-  devtool: 'cheap-source-map',
+  devtool: "cheap-source-map",
   devServer: {
-    contentBase: path.resolve(__dirname, 'dist'),
+    contentBase: path.resolve(__dirname, "dist"),
     stats: {
       colors: true,
       chunks: false,
-      children: false
+      children: false,
     },
     before() {
       spawn(
-        'electron',
-        ['.'],
-        { shell: true, env: process.env, stdio: 'inherit' }
+        "electron",
+        ["."],
+        {shell: true, env: process.env, stdio: "inherit"}
       )
-        .on('close', () => process.exit(0))
-        .on('error', spawnError => console.error(spawnError))
-    }
-  }
-}
+        .on("close", () => process.exit(0))
+        .on("error", spawnError => {
+          // eslint-disable-next-line no-console
+          console.error(spawnError);
+        });
+    },
+  },
+};

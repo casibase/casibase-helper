@@ -146,3 +146,6 @@ userdata
 
 # builds
 release
+
+# Lock files - use yarn.lock only
+package-lock.json

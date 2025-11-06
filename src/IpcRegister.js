@@ -18,10 +18,9 @@ const unzipper = require("unzipper");
 const {ipcMain} = require("electron");
 const {HttpsProxyAgent} = require("https-proxy-agent");
 const {SocksProxyAgent} = require("socks-proxy-agent");
-const path = require("path")
-const { addLog, getLogs, clearLogs } = require(path.join(__dirname, "backends/Log"));
-const { app, BrowserWindow } = require("electron");
-const url = require("url")
+const path = require("path");
+const {addLog, getLogs, clearLogs} = require(path.join(__dirname, "backends/Log"));
+const {app, BrowserWindow} = require("electron");
 
 function registerHandlers(mainWindow, indexPath) {
   ipcMain.handle("download-update", async(event, assetUrl, dest, appConf) => {
@@ -31,9 +30,11 @@ function registerHandlers(mainWindow, indexPath) {
 
     try {
       const res = agent
-      ? await fetch(assetUrl, {agent})
+        ? await fetch(assetUrl, {agent})
         : await fetch(assetUrl);
-    if (!res.ok) {throw new Error(`${res.status}`);}
+      if (!res.ok) {
+        throw new Error(`Failed to download: HTTP ${res.status}`);
+      }
 
       const total = parseInt(res.headers.get("content-length"), 10);
       let received = 0;
@@ -51,13 +52,13 @@ function registerHandlers(mainWindow, indexPath) {
       });
 
       await fs.createReadStream(dest)
-      .pipe(unzipper.Extract({path: INSTALL_DIR}))
+        .pipe(unzipper.Extract({path: INSTALL_DIR}))
         .promise();
       mainWindow.webContents.send("update-done");
-    }
-    catch (error) {
-      mainWindow.webContents.send("download-error", error.message);
-      return Promise.reject(new Error(error.message));
+    } catch (error) {
+      const errorMessage = error.message || "Unknown error occurred during download";
+      mainWindow.webContents.send("download-error", errorMessage);
+      return Promise.reject(new Error(errorMessage));
     }
   });
 
@@ -73,7 +74,7 @@ function registerHandlers(mainWindow, indexPath) {
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: false,
-      }
+      },
     });
     logsPath = indexPath + "#/logs";
     logWindow.loadURL(logsPath);
@@ -85,13 +86,13 @@ function registerHandlers(mainWindow, indexPath) {
   ipcMain.handle("get-logs", () => getLogs());
   ipcMain.handle("clear-logs", () => clearLogs());
   ipcMain.on("add-log", (event, type, message) => {
-    addLog(type, message)
+    addLog(type, message);
     BrowserWindow.getAllWindows().forEach(win => {
       win.webContents.send("new-log", {
         id: Date.now() + Math.random(),
         type,
         message,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     });
   });

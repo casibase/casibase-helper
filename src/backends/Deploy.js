@@ -12,38 +12,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const fs = require('fs');
+const fs = require("fs");
 const fsPromises = fs.promises;
-const path = require('path');
-const { spawn } = require('child_process');
-const http = require('http');
-const serveHandler = require('serve-handler');
-const { ipcRenderer } = require("electron");
+const path = require("path");
+const {spawn} = require("child_process");
+const http = require("http");
+const serveHandler = require("serve-handler");
+const {ipcRenderer} = require("electron");
 
 export const appPath = await ipcRenderer.invoke("get-app-path");
 
-const configDirPath = path.join(appPath, "conf")
-export const configPath = path.join(configDirPath, "app.conf")
-const binaryPath = path.join(appPath, "casibase.exe")
-const dataPath = path.join(appPath, "data")
-const staticPath = path.join(appPath, "web/build")
-
+const configDirPath = path.join(appPath, "conf");
+export const configPath = path.join(configDirPath, "app.conf");
+const binaryPath = path.join(appPath, "casibase.exe");
+const dataPath = path.join(appPath, "data");
+const staticPath = path.join(appPath, "web/build");
 
 if (!fs.existsSync(configDirPath)) {
-  fs.mkdirSync(configDirPath, { recursive: true });
+  fs.mkdirSync(configDirPath, {recursive: true});
 }
 
 export function srcCheck() {
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     try {
       const binaryExists = fs.existsSync(binaryPath);
       const staticExists = fs.existsSync(staticPath);
       const dataExists = fs.existsSync(dataPath);
 
-      if (binaryExists && staticExists & dataExists) {
+      if (binaryExists && staticExists && dataExists) {
         return resolve(true);
       } else {
-        return reject(new Error("resources not found"))
+        const missing = [];
+        if (!binaryExists) {missing.push("binary");}
+        if (!staticExists) {missing.push("static files");}
+        if (!dataExists) {missing.push("data");}
+        return reject(new Error(`Resources not found: ${missing.join(", ")}`));
       }
     } catch (err) {
       reject(err);
@@ -52,18 +55,20 @@ export function srcCheck() {
 }
 
 export function confCheck() {
-  return new Promise(async (resolve, reject) => {
+  return new Promise(async(resolve, reject) => {
     try {
-      if (!fs.existsSync(configPath)) return reject(new Error('config file not found'));
+      if (!fs.existsSync(configPath)) {
+        return reject(new Error("Config file not found"));
+      }
 
-      const lines = (await fsPromises.readFile(configPath, 'utf-8')).split(/\r?\n/).filter(Boolean);
+      const lines = (await fsPromises.readFile(configPath, "utf-8")).split(/\r?\n/).filter(Boolean);
       for (const line of lines) {
-        if (line.trim() && !line.includes('=')) {
-          return reject(new Error(`${line}`));
+        if (line.trim() && !line.includes("=")) {
+          return reject(new Error(`Invalid config line: ${line}`));
         }
-        const confItem = line.split('=');
+        const confItem = line.split("=");
         if (!checkConfItem(confItem[0].trim(), confItem[1].trim())) {
-          return reject(new Error(`${confItem[0]}`));
+          return reject(new Error(`Invalid config value for: ${confItem[0]}`));
         }
       }
       resolve(true);
@@ -80,59 +85,60 @@ export function deployApp() {
     let frontendReady = false;
 
     try {
-      const backendDir = path.join(binaryPath, '..');
+      const backendDir = path.join(binaryPath, "..");
 
-      backend = spawn('./casibase.exe', {
+      backend = spawn("./casibase.exe", {
         cwd: backendDir,
         windowsHide: true,
-        stdio: ['pipe', 'pipe', 'pipe']
+        stdio: ["pipe", "pipe", "pipe"],
       });
 
-      backend.stdout.on('data', (data) => {
+      backend.stdout.on("data", (data) => {
         const msg = data.toString();
-        // record log 
-        ipcRenderer.send("add-log", 'info', msg.trim());
+        // record log
+        ipcRenderer.send("add-log", "info", msg.trim());
 
-        if (!backendReady && msg.includes('http server Running on')) {
+        if (!backendReady && msg.includes("http server Running on")) {
           backendReady = true;
           checkReady();
         }
       });
 
-      backend.stderr.on('data', (data) => {
-        ipcRenderer.send("add-log", 'error', data.toString().trim());
+      backend.stderr.on("data", (data) => {
+        const errorMsg = data.toString().trim();
+        ipcRenderer.send("add-log", "error", errorMsg);
         cleanup();
-        return reject(new Error(data.toString().trim().split("\n")[0] || ""))
+        return reject(new Error(errorMsg.split("\n")[0] || "Backend process error"));
       });
 
       frontend = http.createServer((req, res) => {
-        return serveHandler(req, res, { public: path.join(process.cwd(), staticPath) });
+        return serveHandler(req, res, {public: path.join(process.cwd(), staticPath)});
       });
 
       frontend.listen(3000, () => {
         frontendReady = true;
-        ipcRenderer.send("add-log", 'info', "front end started.");
+        ipcRenderer.send("add-log", "info", "Frontend server started on port 3000");
         checkReady();
       });
 
-      frontend.on('error', (err) => {
-        ipcRenderer.send("add-log", 'error', err);
+      frontend.on("error", (err) => {
+        ipcRenderer.send("add-log", "error", err.message || err.toString());
         cleanup();
-        return reject(new Error(err))
+        return reject(new Error(err.message || "Frontend server error"));
       });
 
       function checkReady() {
         if (backendReady && frontendReady) {
           resolve({
             backend,
-            frontend
+            frontend,
           });
         }
       }
 
       function cleanup() {
-        if (backend && !backend.killed) backend.kill();
-        if (frontend && frontend.listening) frontend.close();
+        if (backend && !backend.killed) {backend.kill();}
+        if (frontend && frontend.listening) {frontend.close();}
       }
 
     } catch (err) {
@@ -145,12 +151,12 @@ export function deployApp() {
 function checkConfItem(confItemName, confItemValue) {
   // check confItem by rule here
   switch (confItemName) {
-    case 'dbName':
-      if (confItemValue === '') {
-        // dbName cannot be empty
-        return false;
-      }
-      break;
+  case "dbName":
+    if (confItemValue === "") {
+      // dbName cannot be empty
+      return false;
+    }
+    break;
   }
   return true;
 }

@@ -14,7 +14,7 @@
 
 const fs = require("fs-extra");
 const path = require("path");
-import {appPath} from './Deploy'
+import {appPath} from "./Deploy";
 
 const CONFIG_PATH = path.join(appPath, "config.json");
 

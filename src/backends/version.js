@@ -16,11 +16,11 @@ const axios = require("axios");
 const fs = require("fs-extra");
 const path = require("path");
 const {ipcRenderer} = window.require("electron");
-import {appPath} from './Deploy'
+import {appPath} from "./Deploy";
 
 const REPO = "casibase/casibase";
-const VERSION_FILE = path.join(appPath,"version.json")
-const DOWNLOADS_DIR = path.join(appPath,"downloads")
+const VERSION_FILE = path.join(appPath, "version.json");
+const DOWNLOADS_DIR = path.join(appPath, "downloads");
 
 export function getLocalVersion() {
   if (!fs.existsSync(VERSION_FILE)) {return null;}

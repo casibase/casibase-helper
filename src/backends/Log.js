@@ -1,6 +1,6 @@
 // Copyright 2025 The Casibase Authors. All Rights Reserved.
 //
-// Licensed under the Apache License, Version 2.0 (the "License")
+// Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const fs = require('fs');
-const path = require('path');
-const { app } = require("electron");
+const fs = require("fs");
+const path = require("path");
+const {app} = require("electron");
 
 const logDir = path.join(app.getPath("userData"), "logs");
 if (!fs.existsSync(logDir)) {
-  fs.mkdirSync(logDir, { recursive: true });
+  fs.mkdirSync(logDir, {recursive: true});
 }
-const logFile = path.join(logDir, 'app.log');
+const logFile = path.join(logDir, "app.log");
 
 let logs = [];
 const MAX_LOGS = 1000;
@@ -30,7 +30,7 @@ function addLog(type, message) {
     id: Date.now() + Math.random(),
     type,
     message,
-    time: new Date().toISOString()
+    time: new Date().toISOString(),
   };
 
   logs.push(logEntry);
@@ -44,13 +44,13 @@ function addLog(type, message) {
   return logEntry;
 }
 
-function getLogs(){
+function getLogs() {
   return logs;
 }
 
-function clearLogs(){
+function clearLogs() {
   logs = [];
-  fs.writeFileSync(logFile, '');
+  fs.writeFileSync(logFile, "");
 }
 
 module.exports = {

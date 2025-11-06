@@ -33,7 +33,7 @@ const Sidebar = () => {
       key: "/setting",
       icon: <SettingOutlined />,
       label: <Link to="/setting">{t("sidebar.Setting")}</Link>,
-    }
+    },
   ];
 
   return (

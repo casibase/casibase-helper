@@ -50,9 +50,9 @@ const SettingPage = ({
       values.proxyUrl = values.proxyUrl.trim();
       if (values.proxyType === "http" && !values.proxyUrl.startsWith("http://")) {
         values.proxyUrl = "http://" + values.proxyUrl;
-      } else if (proxyType === "https" && !values.proxyUrl.startsWith("https://")) {
+      } else if (values.proxyType === "https" && !values.proxyUrl.startsWith("https://")) {
         values.proxyUrl = "https://" + values.proxyUrl;
-      } else if (proxyType === "socks5" && !values.proxyUrl.startsWith("socks5://")) {
+      } else if (values.proxyType === "socks5" && !values.proxyUrl.startsWith("socks5://")) {
         values.proxyUrl = "socks5://" + values.proxyUrl;
       }
     }

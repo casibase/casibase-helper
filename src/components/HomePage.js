@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect, useState } from "react";
-import { Button, Card, Space, Spin, Tag, Tooltip, Typography, Steps, Progress, message } from "antd";
+import React, {useEffect, useState} from "react";
+import {Button, Card, Space, Spin, Steps, Tag, Tooltip, Typography, message} from "antd";
 import PropTypes from "prop-types";
-import { CheckCircleTwoTone, CloseCircleTwoTone, SyncOutlined, FileTextOutlined, SettingOutlined } from "@ant-design/icons";
-import { useTranslation } from "react-i18next";
-const { ipcRenderer } = window.require("electron");
-import { getLatestVersion, getLocalVersion, update } from "../backends/version";
-import { Link } from "react-router-dom";
-import { readAppConf, saveAppConf } from '../backends/Conf';
+import {CheckCircleTwoTone, CloseCircleTwoTone, FileTextOutlined, SettingOutlined, SyncOutlined} from "@ant-design/icons";
+import {useTranslation} from "react-i18next";
+const {ipcRenderer} = window.require("electron");
+import {getLatestVersion, getLocalVersion, update} from "../backends/version";
+import {Link} from "react-router-dom";
+import {readAppConf, saveAppConf} from "../backends/Conf";
 
-const { Title } = Typography;
-const { Step } = Steps;
+const {Title} = Typography;
+const {Step} = Steps;
 
 const HomePage = (
   {
@@ -39,19 +39,18 @@ const HomePage = (
     running,
     errorInfo,
   }) => {
-  const { t } = useTranslation();
-  const [progress, setProgress] = useState(0);
+  const {t} = useTranslation();
   const [localVersion, setLocalVersion] = useState(null);
   const [latestVersion, setLatestVersion] = useState(null);
   const [checkingVersion, setCheckingVersion] = useState(true);
 
-  useEffect(async () => {
+  useEffect(async() => {
     ipcRenderer.on("download-error", (event, errorMessage) => {
       setIsUpdating(false);
-      message.error(errorMessage)
+      message.error(errorMessage);
     });
-    ipcRenderer.on("download-progress", (_, percent) => {
-      setProgress(percent);
+    ipcRenderer.on("download-progress", () => {
+      // Progress tracking would be implemented here
     });
     await checkUpdate();
     return () => {
@@ -70,32 +69,32 @@ const HomePage = (
 
   async function handleUpdate() {
     setIsUpdating(true);
-    let existConf = []
+    let existConf = [];
     try {
       existConf = await readAppConf();
-    }catch(err){
+    } catch {
       existConf = [
-        {key:'driverName', value:'sqlite'},
-        {key:'dataSourceName', value:'./database.sqlite'},
-        {key:'dbName', value:'casibase'},
-      ]
+        {key: "driverName", value: "sqlite"},
+        {key: "dataSourceName", value: "./database.sqlite"},
+        {key: "dbName", value: "casibase"},
+      ];
     }
     try {
       const localVersion = await update(appConfig);
       setLocalVersion(localVersion);
-      await saveAppConf(existConf)
+      await saveAppConf(existConf);
     } finally {
       setIsUpdating(false);
     }
   }
 
   return (
-    <div style={{ padding: 24, height: "100vh" }}>
+    <div style={{padding: 24, height: "100vh"}}>
       <Card
-        style={{ marginBottom: 24 }}
+        style={{marginBottom: 24}}
         title={
           <Space align="center">
-            <Title level={4} style={{ margin: 0 }}>
+            <Title level={4} style={{margin: 0}}>
               {t("version.casibase")}
             </Title>
             {checkingVersion ? (
@@ -156,8 +155,8 @@ const HomePage = (
               key={idx}
               icon={
                 stepsStatus[idx] === "process" ? <SyncOutlined spin /> :
-                  stepsStatus[idx] === "finish" ? <CheckCircleTwoTone style={{ color: "green" }} /> :
-                    stepsStatus[idx] === "error" ? <CloseCircleTwoTone style={{ color: "red" }} /> : null
+                  stepsStatus[idx] === "finish" ? <CheckCircleTwoTone style={{color: "green"}} /> :
+                    stepsStatus[idx] === "error" ? <CloseCircleTwoTone style={{color: "red"}} /> : null
               }
               title={
                 <Space>
