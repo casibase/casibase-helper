@@ -7,6 +7,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=development webpack serve --hot --host 0.0.0.0 --config=./webpack.dev.config.js --mode development",
     "lint": "eslint \"src/**/*.{js,jsx}\" --fix",
+    "lint:check": "eslint \"src/**/*.{js,jsx}\"",
     "build": "cross-env NODE_ENV=production webpack --config webpack.build.config.js --mode production",
     "postpackage": "electron-builder --config electron-builder.yml"
   },
