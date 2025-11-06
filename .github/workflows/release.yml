@@ -14,8 +14,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-      - run: yarn global add semantic-release@17.4.4 @semantic-release/commit-analyzer @semantic-release/release-notes-generator @semantic-release/git @semantic-release/github@11.0.6
+          node-version: 22
+      - run: yarn global add semantic-release@17.4.4 @semantic-release/commit-analyzer @semantic-release/release-notes-generator @semantic-release/git @semantic-release/github
 
       - name: Bump version
         id: setver
@@ -40,7 +40,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: yarn
 
       - name: Install dependencies
@@ -103,12 +103,12 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
       - name: Release
-        run: yarn global add semantic-release@17.4.4 @semantic-release/commit-analyzer @semantic-release/release-notes-generator @semantic-release/git @semantic-release/github@11.0.6 && semantic-release
+        run: yarn global add semantic-release@17.4.4 @semantic-release/commit-analyzer @semantic-release/release-notes-generator @semantic-release/git @semantic-release/github && semantic-release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
