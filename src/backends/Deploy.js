@@ -33,7 +33,7 @@ if (!fs.existsSync(configDirPath)) {
 }
 
 export function srcCheck() {
-  return new Promise(async(resolve, reject) => {
+  return new Promise((resolve, reject) => {
     try {
       const binaryExists = fs.existsSync(binaryPath);
       const staticExists = fs.existsSync(staticPath);
@@ -42,7 +42,11 @@ export function srcCheck() {
       if (binaryExists && staticExists && dataExists) {
         return resolve(true);
       } else {
-        return reject(new Error("resources not found"));
+        const missing = [];
+        if (!binaryExists) {missing.push("binary");}
+        if (!staticExists) {missing.push("static files");}
+        if (!dataExists) {missing.push("data");}
+        return reject(new Error(`Resources not found: ${missing.join(", ")}`));
       }
     } catch (err) {
       reject(err);
@@ -53,16 +57,18 @@ export function srcCheck() {
 export function confCheck() {
   return new Promise(async(resolve, reject) => {
     try {
-      if (!fs.existsSync(configPath)) {return reject(new Error("config file not found"));}
+      if (!fs.existsSync(configPath)) {
+        return reject(new Error("Config file not found"));
+      }
 
       const lines = (await fsPromises.readFile(configPath, "utf-8")).split(/\r?\n/).filter(Boolean);
       for (const line of lines) {
         if (line.trim() && !line.includes("=")) {
-          return reject(new Error(`${line}`));
+          return reject(new Error(`Invalid config line: ${line}`));
         }
         const confItem = line.split("=");
         if (!checkConfItem(confItem[0].trim(), confItem[1].trim())) {
-          return reject(new Error(`${confItem[0]}`));
+          return reject(new Error(`Invalid config value for: ${confItem[0]}`));
         }
       }
       resolve(true);
@@ -89,7 +95,7 @@ export function deployApp() {
 
       backend.stdout.on("data", (data) => {
         const msg = data.toString();
-        // record log 
+        // record log
         ipcRenderer.send("add-log", "info", msg.trim());
 
         if (!backendReady && msg.includes("http server Running on")) {
@@ -99,9 +105,10 @@ export function deployApp() {
       });
 
       backend.stderr.on("data", (data) => {
-        ipcRenderer.send("add-log", "error", data.toString().trim());
+        const errorMsg = data.toString().trim();
+        ipcRenderer.send("add-log", "error", errorMsg);
         cleanup();
-        return reject(new Error(data.toString().trim().split("\n")[0] || ""));
+        return reject(new Error(errorMsg.split("\n")[0] || "Backend process error"));
       });
 
       frontend = http.createServer((req, res) => {
@@ -110,14 +117,14 @@ export function deployApp() {
 
       frontend.listen(3000, () => {
         frontendReady = true;
-        ipcRenderer.send("add-log", "info", "front end started.");
+        ipcRenderer.send("add-log", "info", "Frontend server started on port 3000");
         checkReady();
       });
 
       frontend.on("error", (err) => {
-        ipcRenderer.send("add-log", "error", err);
+        ipcRenderer.send("add-log", "error", err.message || err.toString());
         cleanup();
-        return reject(new Error(err));
+        return reject(new Error(err.message || "Frontend server error"));
       });
 
       function checkReady() {

@@ -1,6 +1,6 @@
 // Copyright 2025 The Casibase Authors. All Rights Reserved.
 //
-// Licensed under the Apache License, Version 2.0 (the "License")
+// Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
@@ -18,30 +18,40 @@ const fsPromises = fs.promises;
 
 export async function readAppConf() {
   return new Promise(async(resolve, reject) => {
-    if (!fs.existsSync(configPath)) {return reject(new Error("Config file is not exist"));}
+    if (!fs.existsSync(configPath)) {
+      return reject(new Error("Config file does not exist"));
+    }
 
-    const txt = await fsPromises.readFile(configPath, "utf-8");
-    const lines = txt
-      .split(/\r?\n/)
-      .filter(line => line.trim() && !line.startsWith("#"))
-      .filter(Boolean);
-    const obj = {};
-    lines.forEach(line => {
-      const [k, v] = line.split("=").map(s => s.trim());
-      obj[k] = v;
-    });
-    return resolve(obj);
+    try {
+      const txt = await fsPromises.readFile(configPath, "utf-8");
+      const lines = txt
+        .split(/\r?\n/)
+        .filter(line => line.trim() && !line.startsWith("#"))
+        .filter(Boolean);
+      const obj = {};
+      lines.forEach(line => {
+        const [k, v] = line.split("=").map(s => s.trim());
+        obj[k] = v;
+      });
+      return resolve(obj);
+    } catch (err) {
+      return reject(new Error(`Failed to read config file: ${err.message}`));
+    }
   });
 }
 
 export async function saveAppConf(content) {
-  const currentConf = await readAppConf();
-  content.forEach(({key, value}) => {
-    if (key in currentConf) {
-      currentConf[key] = value;
-    }
-  });
-  const newConf = Object.entries(currentConf).map(([k, v]) => `${k} = ${v}`).join("\n");
-  fs.writeFileSync(configPath, newConf, "utf-8");
-  return true;
+  try {
+    const currentConf = await readAppConf();
+    content.forEach(({key, value}) => {
+      if (key in currentConf) {
+        currentConf[key] = value;
+      }
+    });
+    const newConf = Object.entries(currentConf).map(([k, v]) => `${k} = ${v}`).join("\n");
+    fs.writeFileSync(configPath, newConf, "utf-8");
+    return true;
+  } catch (err) {
+    throw new Error(`Failed to save config: ${err.message}`);
+  }
 }
