@@ -32,7 +32,9 @@ function registerHandlers(mainWindow, indexPath) {
       const res = agent
         ? await fetch(assetUrl, {agent})
         : await fetch(assetUrl);
-      if (!res.ok) {throw new Error(`${res.status}`);}
+      if (!res.ok) {
+        throw new Error(`Failed to download: HTTP ${res.status}`);
+      }
 
       const total = parseInt(res.headers.get("content-length"), 10);
       let received = 0;
@@ -54,8 +56,9 @@ function registerHandlers(mainWindow, indexPath) {
         .promise();
       mainWindow.webContents.send("update-done");
     } catch (error) {
-      mainWindow.webContents.send("download-error", error.message);
-      return Promise.reject(new Error(error.message));
+      const errorMessage = error.message || "Unknown error occurred during download";
+      mainWindow.webContents.send("download-error", errorMessage);
+      return Promise.reject(new Error(errorMessage));
     }
   });
 

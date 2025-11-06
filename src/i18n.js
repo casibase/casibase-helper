@@ -24,7 +24,7 @@ i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
-    // delete to auto detact browser language after complete i18n
+    // Remove lng to auto-detect browser language after i18n is complete
     lng: "en",
     fallbackLng: "en",
     debug: process.env.NODE_ENV === "development",
